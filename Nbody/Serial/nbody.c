@@ -76,8 +76,8 @@ void savePositionsToFile(Body *p, int nBodies, const char *filename) {
   }
 
   for (int i = 0; i < nBodies; i++) {
-    fprintf(file, "Body %d: Position(%f, %f, %f) Velocity(%f, %f, %f)\n", 
-            i, p[i].x, p[i].y, p[i].z, p[i].vx, p[i].vy, p[i].vz);
+    fprintf(file, "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n", 
+            p[i].x, p[i].y, p[i].z, p[i].vx, p[i].vy, p[i].vz);
   }
   
   fclose(file);
@@ -158,7 +158,7 @@ int main(const int argc, const char** argv) {
 //       p[i].vz = z * scale;
 //     }
 
-  savePositionsToFile(p, nBodies, "serial_start.txt");
+  savePositionsToFile(p, nBodies, "serial_start.csv");
 ////////////////////////////////////////////////////////////////////////////////////// 
   double totalTime = 0.0;
 
@@ -178,7 +178,7 @@ int main(const int argc, const char** argv) {
       totalTime += tElapsed; 
     }
 
-    printf("Iteration %d: %.3f seconds\n", iter, tElapsed);
+    printf("Iteration %d: %.5f seconds\n", iter, tElapsed);
 
   }
   double avgTime = totalTime / (double)(nIters-1); 
@@ -189,7 +189,7 @@ int main(const int argc, const char** argv) {
 
   printf("%d Bodies: average %0.3f Billion Interactions / second\n", nBodies, 1e-9 * nBodies * nBodies / avgTime);
 
-  savePositionsToFile(p, nBodies, "serial_end.txt");
+  savePositionsToFile(p, nBodies, "serial_end.csv");
   free(buf);
   return 0;
 }

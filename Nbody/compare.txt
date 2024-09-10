@@ -1,0 +1,31 @@
+The files differ in 10000 pairs.
+Average position deviation: 0.002607
+Standard deviation of position deviation: 0.002716
+Average velocity deviation: 0.047223
+Standard deviation of velocity deviation: 0.049010
+
+chu264@scholar-fe05:~/Desktop/github/GPUCompiler/Nbody/Naive_parallel $  ./nbody_block_cuda 15 10
+Iteration 1: 0.00011 seconds
+Iteration 2: 0.00002 seconds
+Iteration 3: 0.00002 seconds
+Iteration 4: 0.00001 seconds
+Iteration 5: 0.00001 seconds
+Iteration 6: 0.00001 seconds
+Iteration 7: 0.00001 seconds
+Iteration 8: 0.00001 seconds
+Iteration 9: 0.00001 seconds
+Iteration 10: 0.00001 seconds
+15 Bodies: average 0.015 Billion Interactions / second
+
+chu264@scholar-fe05:~/Desktop/github/GPUCompiler/Nbody/Serial $ ./nbody 15 10
+Iteration 1: 0.00002 seconds
+Iteration 2: 0.00001 seconds
+Iteration 3: 0.00001 seconds
+Iteration 4: 0.00001 seconds
+Iteration 5: 0.00001 seconds
+Iteration 6: 0.00001 seconds
+Iteration 7: 0.00001 seconds
+Iteration 8: 0.00001 seconds
+Iteration 9: 0.00001 seconds
+Iteration 10: 0.00001 seconds
+15 Bodies: average 0.017 Billion Interactions / second

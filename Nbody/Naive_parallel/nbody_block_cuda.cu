@@ -32,10 +32,8 @@ void savePositionsToFile(BodySystem &p, int nBodies, const char* filepath) {
   }
 
   for (int i = 0; i < nBodies; i++) {
-    // Position from float4
-    fprintf(file, "Body %d: Position(%.6f, %.6f, %.6f) ", i, p.pos[i].x, p.pos[i].y, p.pos[i].z);
-    // Velocity from float4
-    fprintf(file, "Velocity(%.6f, %.6f, %.6f)\n", p.vel[i].x, p.vel[i].y, p.vel[i].z);
+    // Write position and velocity to CSV
+    fprintf(file, "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n", p.pos[i].x, p.pos[i].y, p.pos[i].z, p.vel[i].x, p.vel[i].y, p.vel[i].z);
   }
 
   fclose(file);
@@ -109,7 +107,7 @@ int main(const int argc, const char** argv) {
 
   randomizeBodies(p.pos, p.vel, nBodies); // Init pos / vel data
 
-  savePositionsToFile(p, nBodies, "gpu_start.txt");
+  savePositionsToFile(p, nBodies, "gpu_start.csv");
 
   float *d_buf;
   cudaMalloc(&d_buf, bytes);
@@ -145,7 +143,7 @@ int main(const int argc, const char** argv) {
   
   printf("%d Bodies: average %0.3f Billion Interactions / second\n", nBodies, 1e-9 * nBodies * nBodies / avgTime);
   
-  savePositionsToFile(p, nBodies, "gpu_end.txt");
+  savePositionsToFile(p, nBodies, "gpu_end.csv");
   
   free(buf);
   cudaFree(d_buf);
