@@ -8,10 +8,37 @@
 
 typedef struct { float4 *pos, *vel; } BodySystem;
 
-void randomizeBodies(float *data, int n) {
+void randomizeBodies(float4 *pos, float4 *vel, int n) {
+  srand(42);
   for (int i = 0; i < n; i++) {
-    data[i] = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    pos[i].x = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    pos[i].y = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    pos[i].z = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    pos[i].w = 0.0f; // Ignored or set to 0
+    
+    // Initialize velocity (vx, vy, vz), set w to 0
+    vel[i].x = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    vel[i].y = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    vel[i].z = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
+    vel[i].w = 0.0f; // Ignored or set to 0
   }
+}
+
+void savePositionsToFile(BodySystem &p, int nBodies, const char* filepath) {
+  FILE *file = fopen(filepath, "w");
+  if (file == NULL) {
+    printf("Error opening file for writing!\n");
+    return;
+  }
+
+  for (int i = 0; i < nBodies; i++) {
+    // Position from float4
+    fprintf(file, "Body %d: Position(%.6f, %.6f, %.6f) ", i, p.pos[i].x, p.pos[i].y, p.pos[i].z);
+    // Velocity from float4
+    fprintf(file, "Velocity(%.6f, %.6f, %.6f)\n", p.vel[i].x, p.vel[i].y, p.vel[i].z);
+  }
+
+  fclose(file);
 }
 
 __global__
@@ -80,7 +107,9 @@ int main(const int argc, const char** argv) {
   float *buf = (float*)malloc(bytes);
   BodySystem p = { (float4*)buf, ((float4*)buf) + nBodies };
 
-  randomizeBodies(buf, 8*nBodies); // Init pos / vel data
+  randomizeBodies(p.pos, p.vel, nBodies); // Init pos / vel data
+
+  savePositionsToFile(p, nBodies, "gpu_start.txt");
 
   float *d_buf;
   cudaMalloc(&d_buf, bytes);
@@ -115,6 +144,9 @@ int main(const int argc, const char** argv) {
 
   
   printf("%d Bodies: average %0.3f Billion Interactions / second\n", nBodies, 1e-9 * nBodies * nBodies / avgTime);
+  
+  savePositionsToFile(p, nBodies, "gpu_end.txt");
+  
   free(buf);
   cudaFree(d_buf);
   return 0;

@@ -42,6 +42,7 @@ static double drnd()
 typedef struct { float x, y, z, vx, vy, vz; } Body;
 
 void randomizeBodies(float *data, int n) {
+  srand(42);
   for (int x = 0; x < n; x++) {
     data[x] = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
   }
@@ -65,6 +66,21 @@ void bodyForce(Body *p, float dt, int n) {
 
     p[i].vx += dt*Fx; p[i].vy += dt*Fy; p[i].vz += dt*Fz;
   }
+}
+
+void savePositionsToFile(Body *p, int nBodies, const char *filename) {
+  FILE *file = fopen(filename, "w");
+  if (file == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+  }
+
+  for (int i = 0; i < nBodies; i++) {
+    fprintf(file, "Body %d: Position(%f, %f, %f) Velocity(%f, %f, %f)\n", 
+            i, p[i].x, p[i].y, p[i].z, p[i].vx, p[i].vy, p[i].vz);
+  }
+  
+  fclose(file);
 }
 
 int main(const int argc, const char** argv) {
@@ -104,44 +120,45 @@ int main(const int argc, const char** argv) {
   int bytes = nBodies*sizeof(Body);
   float *buf = (float*)malloc(bytes);
   Body *p = (Body*)buf;
-/*
+  
   randomizeBodies(buf, 6*nBodies); // Init pos / vel data
-*/
 //////////////////////////////////////////////////////////////////////////////////////////
 /*Data Generation*/
-drndset(7);
-    rsc = (3 * 3.1415926535897932384626433832795) / 16;
-    vsc = sqrt(1.0 / rsc);
-    for (int i = 0; i < nBodies; i++) {
-     // mass[i] = 1.0 / nbodies;
-      r = 1.0 / sqrt(pow(drnd()*0.999, -2.0/3.0) - 1);
-      do {
-        x = drnd()*2.0 - 1.0;
-        y = drnd()*2.0 - 1.0;
-        z = drnd()*2.0 - 1.0;
-        sq = x*x + y*y + z*z;
-      } while (sq > 1.0);
-      scale = rsc * r / sqrt(sq);
-      p[i].x = x * scale;
-      p[i].y = y * scale;
-      p[i].z = z * scale;
+// drndset(7);
+//     rsc = (3 * 3.1415926535897932384626433832795) / 16;
+//     vsc = sqrt(1.0 / rsc);
+//     for (int i = 0; i < nBodies; i++) {
+//      // mass[i] = 1.0 / nbodies;
+//       r = 1.0 / sqrt(pow(drnd()*0.999, -2.0/3.0) - 1);
+//       do {
+//         x = drnd()*2.0 - 1.0;
+//         y = drnd()*2.0 - 1.0;
+//         z = drnd()*2.0 - 1.0;
+//         sq = x*x + y*y + z*z;
+//       } while (sq > 1.0);
+//       scale = rsc * r / sqrt(sq);
+//       p[i].x = x * scale;
+//       p[i].y = y * scale;
+//       p[i].z = z * scale;
 
-      do {
-        x = drnd();
-        y = drnd() * 0.1;
-      } while (y > x*x * pow(1 - x*x, 3.5));
-      v = x * sqrt(2.0 / sqrt(1 + r*r));
-      do {
-        x = drnd()*2.0 - 1.0;
-        y = drnd()*2.0 - 1.0;
-        z = drnd()*2.0 - 1.0;
-        sq = x*x + y*y + z*z;
-      } while (sq > 1.0);
-      scale = vsc * v / sqrt(sq);
-      p[i].vx = x * scale;
-      p[i].vy = y * scale;
-      p[i].vz = z * scale;
-    }
+//       do {
+//         x = drnd();
+//         y = drnd() * 0.1;
+//       } while (y > x*x * pow(1 - x*x, 3.5));
+//       v = x * sqrt(2.0 / sqrt(1 + r*r));
+//       do {
+//         x = drnd()*2.0 - 1.0;
+//         y = drnd()*2.0 - 1.0;
+//         z = drnd()*2.0 - 1.0;
+//         sq = x*x + y*y + z*z;
+//       } while (sq > 1.0);
+//       scale = vsc * v / sqrt(sq);
+//       p[i].vx = x * scale;
+//       p[i].vy = y * scale;
+//       p[i].vz = z * scale;
+//     }
+
+  savePositionsToFile(p, nBodies, "serial_start.txt");
 ////////////////////////////////////////////////////////////////////////////////////// 
   double totalTime = 0.0;
 
@@ -172,6 +189,7 @@ drndset(7);
 
   printf("%d Bodies: average %0.3f Billion Interactions / second\n", nBodies, 1e-9 * nBodies * nBodies / avgTime);
 
+  savePositionsToFile(p, nBodies, "serial_end.txt");
   free(buf);
   return 0;
 }
